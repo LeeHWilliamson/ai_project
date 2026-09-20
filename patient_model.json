@@ -22,70 +22,77 @@ week_x represents a snapshot of active for that given week and entries for any e
     "blood_type": str,
     "family_history": [str],
   },
-  "active" : {
-    "notes": #didn't include appetite / hunger because changes in that are caught by weekly_diet,
-    "age": int,
-    "income": float,
-    "primary_insurance" : bool,
-    "primary_insurance_source": enum [self, medicare, medicade, employer],
-    "primary_insurance_plan": enum [HMO, PPO, EPO, POS],
-    "primary_insurance_coverage": [health, vision, dental, etc]
-    "secondary_insurance": bool,
-    "secondary_insurance_source": enum,
-    "secondary_insurance_plan": enum,
-    "secondary_insurance_converage": enum,
-    "weight": float,
-    "waist_size": float,
-    "thirst": int, #range == 1 to 5, 3 == baseline based on age, size, activity, etc,
-    "urintation": int, measures weekly frequency
-    "work_activity": enum [low, medium, high] low = white collar, medium = school teacher / plumber, high = waiter
-    "minutes_weekly_exercise": float,
-    "weekly_diet": {"avg_daily_calories" : int, "percent_carbs": float, "total_carbs": int, "percent_fiber": float, "total_fiber": int},
-    "social_activity": int, range 1-10 with 5 being baseline
-    "hdl_cholesterol": float,
-    "triglycerides": float,
-    "blood_pressure": float,
-    "visual_acuity": float,
-    "hearing": float,
-    "avg_nightly_sleep": float,
-    "insulin_therapy": [{"type" : str, "dosage": float, "frequency": float}],
-    "insulin_monotoring": [{"device": str, "frequency": float}],
-    "6_month_trend": {all above},
-    "6_month_avg": {all above},
-    "medications": ["name": str, "dosage": float, "units" : str, "frequency": float, "frequency_units": str, "encounter": str, "active_side_effects": [str]],
-    "pregnant": bool,
-    "gestational_diabetes": bool,
-    "birthed_child_over_9_pounds": bool,
-    "complications": [str],
-    "polycystic_ovary_syndrome": bool,
-    "primary_care_encounter_last_6_months": bool,
-    "specialist_encounter_last_6_months": bool,
-    "dietician_encounter_last_6_months": bool,
-    "primary_care_encounter_next_6_months": bool,
-    "specialist_encounter_next_6_months": bool,
-    "dietician_encounter_next_6_months": bool,
-    "complications" : [str],
-    "symptoms" : [{"name" : str, "cause" : [str], "severity": int}]
+  "state" : {
+    "physical": {"measurements" : {
+      "weight": float,
+      "waist_size": float,
+      "thirst": int, #range == 1 to 5, 3 == baseline based on age, size, activity, etc,
+      "urintation": int, measures weekly frequency,
+      "hdl_cholesterol": float,
+      "triglycerides": float,
+      "blood_pressure": float,
+      "visual_acuity": float,
+      "hearing": float,
+    },
+    "attributes": {
+      "gestational_diabetes": bool,
+      "birthed_child_over_9_pounds": bool,
+      "polycystic_ovary_syndrome": bool,
+      "pregnant": bool,
+      "conditions" : [{}],
+      "symptoms" : [{"name" : str, "cause" : [str], "severity": int}], ##symptoms are things like nausea and diahrrhea that can have multiple causes (medicines, diabetes, complications, no clear cause)
+    }},
+    "care" : { "measurements": {},
+      "attributes": {
+        "insulin_monitoring": [{"device": str, "frequency": float}],
+        "medications": ["name": str, "dosage": float, "units" : str, "frequency": float, "frequency_units": str, "encounter": str, "active_side_effects": [str]],
+        "insulin_therapy": [{"type" : str, "dosage": float, "frequency": float}],
+        "careplans" : []
+      }
+    },
+    "behavioral" : { 
+      "measurements" : {
+        "minutes_weekly_exercise": float,
+        "weekly_diet": {"avg_daily_calories" : int, "percent_carbs": float, "total_carbs": int, "percent_fiber": float, "total_fiber": int},
+        "social_activity": int, range 1-10 with 5 being baseline
+        "avg_nightly_sleep": float,
+      },
+    "attributes" : {
+      "work_activity": enum [low, medium, high] low = white collar, medium = school teacher / plumber, high = waiter
+    }
   },
-  "encounters" : {"attended" : [{
+    "socio_economic" : {
+      "measurements" : {
+        "income": float
+      },
+      "attributes" : {
+        "primary_insurance" : bool,
+        "primary_insurance_source": enum [self, medicare, medicade, employer],
+        "primary_insurance_plan": enum [HMO, PPO, EPO, POS],
+        "primary_insurance_coverage": [health, vision, dental, etc]
+        "secondary_insurance": bool,
+        "secondary_insurance_source": enum,
+        "secondary_insurance_plan": enum,
+        "secondary_insurance_converage": enum,
+      }
+    },
+  "encounters" : [{
     "id": str,
-    "attendance": enum ["attended", "missed", "scheduled"]
-    "date": datetime,
-    "attended": bool,
+    "attributes": enum ["attended", "missed", "scheduled"]
+    "scheduled_date": datetime,
+    "actual_date": datetime | None,
     "type": str (routine, non-routine, emergency),
-    "provider_specialty" : str (PCP, NP, labs, endcrinologist, dietician, etc),
+    "provider" : str (PCP, NP, labs, endcrinologist, dietician, etc),
     "tests_performed": [str],
     "orders" : ["medications" : [{}], "procedures" : [{}], "tests" : [{}], "referrals" : [{}]]
     "procedures": [str],
     "diagnoses": [str],
-    "follow_up_scheduled": bool,
-    "follow_up_date": datetime,
+    "follow_up": {
+      "recommended": bool,
+      "scheduled_encounter_id": str | None
+    }
   }],
-  "missed" : [{}],
-  "scheduled" : [{}]
-  }
-  "week_1" : {
-    ##this entity will contain most items from "active", but not 6 month trends or averages
-    "encounters": [{}] ##this field will contain all encounters that happened this week (attended, missed, and scheduled), if any
+  "measurements": [{}] ##things that can be expected to fluctuate over time
+  "events": [{}] #events that have a definite beginning and may have an ending, may arise from measurement changes, other events, patient attributes, or randomly
   }
 }
